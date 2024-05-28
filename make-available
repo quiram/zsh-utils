@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+
+zshrc="$HOME/.zshrc"
+
+echo "# Add zsh-utils to path" >>"${zshrc}"
+echo "source ${BUILD_SCRIPTS_DIR}/add-to-path" >>"${zshrc}"
+echo "" >>"${zshrc}"
+
+# shellcheck source=$HOME/.zshrc
+source "${zshrc}"

@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+
+for folder in $(find ${BUILD_SCRIPTS_DIR} -type d -not -path '*/\.*'); do
+    export PATH=${folder}:${PATH}
+done
+
