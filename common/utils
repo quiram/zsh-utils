@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+
+log() {
+  echo "[BU] $*"
+}
+
+# The following allows us to kill the running script regardless of the level of function nesting.
+# Otherwise, each function creates a subshell, and running "exit 1" on the subshell simply exists the subshell, not the overall program
+# See https://stackoverflow.com/a/9894126/2302613
+trap "exit 1" TERM
+export TOP_PID=$$
+
+fail() {
+  echo "[BU] $*" >&2
+  kill -s TERM $TOP_PID
+}
+
+# Usage:
+# silentExec <message> <command> [stop-on-failure]
+#     <message>: message to display to the user (command's output is suppressed)
+#     <command>: command to execute
+#     [stop-on-failure]: (optional) whether to stop the script on failure or carry on (defaults to true)
+#
+#     $silentExecExitCode: variable containing the exit code of the command executed by silentExec
+silentExec() {
+  local text=$1
+  local command=$2
+  local stopOnFailure=${3-"true"}
+  echo -n "${text}... "
+  eval "${command} >/dev/null 2>&1" >/dev/null 2>&1
+  silentExecExitCode=$?
+  if [[ ${silentExecExitCode} == 0 ]]; then
+    echo -e "\033[1;92mOK\033[m"
+  else
+    echo -e "\033[1;31mERROR\033[m"
+    if [[ "${stopOnFailure}" == "true" ]]; then
+      exit 1
+    fi
+  fi
+}
