@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+# This utility updates the toolchains.xml file with the available Java installations assuming:
+#   - the toolchains.xml file is stored in $HOME/.m2
+#   - the different available Java kits are all OpenJDK
+#   - the different available Java kits are all installed using Homebrew
+
+content="<toolchains>"
+
+while IFS= read -r -d '' jdk; do
+  major=$(echo $jdk | cut -d\/ -f6 | cut -d\. -f1)
+  toolchain=$(cat <<-END
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>${major}</version>
+        </provides>
+        <configuration>
+            <jdkHome>${jdk}</jdkHome>
+        </configuration>
+    </toolchain>
+END
+
+)
+  content="${content}\n${toolchain}"
+done < <(find /opt/homebrew/Cellar -path "*openjdk*" -maxdepth 2 -mindepth 2 -type d -print0)
+
+content="${content}\n</toolchains>"
+
+echo "${content}" > "$HOME"/.m2/toolchains.xml
+
