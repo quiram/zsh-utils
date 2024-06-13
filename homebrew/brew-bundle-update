@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
 # shellcheck source=../common/utils
