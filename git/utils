@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+# shellcheck source=../common/utils
+source "${BUILD_SCRIPTS_DIR}/../common/utils"
+
+error=$(git status 2>&1 | grep "fatal: not a git repository")
+[ -z "$error" ] || fail "This isn't a GIT repository"
+
+maybe_main=$(git branch --list | grep main)
+if [ -z "${maybe_main}" ]; then
+    export main="master"
+else
+    export main="main"
+fi
