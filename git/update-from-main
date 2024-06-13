@@ -17,11 +17,10 @@ if [[ $# -gt 2 ]]; then
     usage_and_exit
 fi
 
-unset options
 for option in "$@"; do
     case ${option} in
         "--safe")
-            options="--exec run-full-build"
+            update_options="--exec run-full-build"
             ;;
         "--stash")
             stash=1
@@ -49,7 +48,7 @@ else
     # shellcheck disable=SC2154
     log "Rebasing from ${main} into ${branch_name}..."
     # shellcheck disable=SC2086
-    git checkout ${main} && rebase_if_remote && git checkout "${branch_name}" && git rebase ${options} ${main}
+    git checkout ${main} && rebase_if_remote && git checkout "${branch_name}" && git rebase ${update_options} ${main}
     result=$?
 fi
 
