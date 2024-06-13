@@ -17,6 +17,7 @@ if [[ $# -gt 2 ]]; then
     usage_and_exit
 fi
 
+unset options
 for option in "$@"; do
     case ${option} in
         "--safe")
