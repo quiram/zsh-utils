@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# Updates the current branch with the latest main value (in remote)
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../git/utils"
+
+usage_and_exit() {
+    echo "Usage: $0 [--safe] [--stash]"
+    echo "    Updates the current branch with the latest main value (in remote)"
+    echo "    --safe: (optional) run a full build after applying each commit"
+    echo "    --stash: (optional) stash local changes prior to updating from main; pop them after successfully updating."
+    exit 1
+}
+
+if [[ $# -gt 2 ]]; then
+    usage_and_exit
+fi
+
+for option in "$@"; do
+    case ${option} in
+        "--safe")
+            options="--exec run-full-build"
+            ;;
+        "--stash")
+            stash=1
+            ;;
+        *)
+            usage_and_exit
+            ;;
+    esac
+done
+
+if [[ "${stash}" -eq 1 ]]; then
+    log "Stashing current work..."
+    git stash
+fi
+
+branch_name=$(branch-name)
+
+log "Rebasing from main..."
+
+# shellcheck disable=SC2154
+if [[ "${branch_name}" = "${main}" ]]; then
+    # shellcheck disable=SC2086
+    git pull -r ${options}
+    result=$?
+else
+    # shellcheck disable=SC2086
+    git checkout ${main} && git pull -r && git checkout "${branch_name}" && git rebase ${options} ${main}
+    result=$?
+fi
+
+if [[ "${stash}" -eq 1 ]]; then
+    if [[ ${result} -eq 0 ]]; then
+        log "Retrieving work from stash..."
+        git stash pop
+    else
+        echo "Error updating from main, pre-existing work is still stashed."
+    fi
+fi
+
+exit ${result}
