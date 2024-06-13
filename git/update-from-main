@@ -38,7 +38,8 @@ fi
 
 branch_name=$(branch-name)
 
-log "Rebasing from main..."
+# shellcheck disable=SC2154
+log "Rebasing from ${main} into ${branch_name}..."
 
 # shellcheck disable=SC2154
 if [[ "${branch_name}" = "${main}" ]]; then
