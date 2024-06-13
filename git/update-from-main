@@ -39,17 +39,17 @@ fi
 
 branch_name=$(branch-name)
 
-# shellcheck disable=SC2154
-log "Rebasing from ${main} into ${branch_name}..."
 
 # shellcheck disable=SC2154
 if [[ "${branch_name}" = "${main}" ]]; then
     # shellcheck disable=SC2086
-    git pull -r ${options}
+    rebase_if_remote
     result=$?
 else
+    # shellcheck disable=SC2154
+    log "Rebasing from ${main} into ${branch_name}..."
     # shellcheck disable=SC2086
-    git checkout ${main} && git pull -r && git checkout "${branch_name}" && git rebase ${options} ${main}
+    git checkout ${main} && rebase_if_remote && git checkout "${branch_name}" && git rebase ${options} ${main}
     result=$?
 fi
 
