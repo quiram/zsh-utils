@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+# Create a new branch off the current one.
+#
+# A prefix can optionally be configured in environment variable NEW_BRANCH_PREFIX;
+# this is useful if you tend to name your branches using a JIRA ticket or similar.
+#
+# You can also default the branch name into an environment variable, useful if you work across several repositories
+# and you want your branches to have the same name across all of them.
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../git/utils"
+
+usage_and_exit() {
+    echo "Usage: $0 <new-branch-name>"
+    echo "    <new-branch-name> can be omitted if the environment variable DEFAULT_NEW_BRANCH_NAME is set."
+    exit 1
+}
+
+if [ $# -eq 1 ]; then
+    new_branch_name=$1
+elif [ $# -eq 0 ] && [ -n "${DEFAULT_NEW_BRANCH_NAME}" ]; then
+    new_branch_name=${DEFAULT_NEW_BRANCH_NAME}
+else
+    usage_and_exit
+fi
+
+current_branch_name=$(branch-name)
+
+# shellcheck disable=SC2154
+[ "${current_branch_name}" = "${main}" ] || echo "WARNING: creating new branch from another branch (${current_branch_name})."
+
+git checkout -b "${NEW_BRANCH_PREFIX}${new_branch_name}"
