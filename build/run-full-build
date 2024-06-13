@@ -27,7 +27,7 @@ fi
 
 log "Running ${type} build as '${cmds[*]}'"
 for cmd in "${cmds[@]}"; do
-    ${cmd}
+    eval ${cmd}
 done
 result=$?
 
