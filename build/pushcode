@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 
 # Safely pushes code into the repository. The way to do is safely is:
 # 1. pull changes (if possible)
