@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Safely pushes code into the repository. The way to do is safely is:
+# 1. pull changes (if possible)
+# 2. run full build locally
+# 3. push
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/build-common"
+
+run_full_build="${BUILD_SCRIPTS_DIR}/run-full-build"
+update_from_main="${BUILD_SCRIPTS_DIR}/../git/update-from-main"
+
+check_for_local_changes() {
+    commit_output=$(git status | grep "nothing to commit")
+
+    log "Ensuring there are no local changes..."
+
+    if [[ "$commit_output" == "" ]]; then
+        fail "You have local changes, pushing is not safe."
+    fi
+}
+
+usage_and_exit() {
+    echo "Usage: $0 [--force]"
+    echo "    Push changes to remote after running the build and running some local checks."
+    echo "    --force: (optional) don't rebase before pushing, and push with git --force"
+    echo "    --safe: (optional) run the build after each commit when rebasing from main"
+    echo "    --skip-build: (optional) don't run the build prior to pushing"
+    exit 1
+}
+
+if [[ $# -gt 2 ]]; then
+    usage_and_exit
+fi
+
+for option in "$@"; do
+    case ${option} in
+        "--safe")
+            update_options="--safe"
+            ;;
+        "--force")
+            force=1
+            git_options="--force"
+            ;;
+        "--skip-build")
+            skip_build=1
+            ;;
+        *)
+            usage_and_exit
+            ;;
+    esac
+done
+
+# make sure everything has been committed
+check_for_local_changes
+
+if [[ -z ${force} ]]; then
+    # rebase only if there is a remote to rebase from
+    rebase_if_remote
+fi
+
+# rebase from main
+${update_from_main} ${update_options} || exit 1
+
+# run the build (if needed)
+if [[ -z ${update_options} && -z ${skip_build} ]]; then
+    ${run_full_build} || exit 1
+fi
+
+# check again, in case the build has reformatted files
+check_for_local_changes
+
+# ...and push
+push_changes ${git_options}

@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+# Get the name of the current branch in this GIT repo
+
+git status | grep "On branch" | cut -d\  -f 3

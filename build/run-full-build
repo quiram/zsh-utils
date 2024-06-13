@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+
+# Identify the type of build tool that we have and run it
+# If parameters are passed, these will be proxied to the actual build tool
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../common/utils"
+
+if [[ -f "build.sh" ]]; then
+    type="custom script"
+    cmds=("./build.sh $*")
+elif [[ -f "pom.xml" ]]; then
+    type="maven"
+    cmds=("mvn $* clean install")
+elif [[ -f "build.sbt" ]]; then
+    type="sbt"
+    cmds=("sbt $* test it:test func:test")
+elif [[ -f "build.gradle" ]]; then
+    type="gradle"
+    cmds=("./gradlew $* clean test")
+elif [[ -f "package.json" ]]; then
+    type="node"
+    cmds=("npm install" "npm run build")
+else
+    fail "Could not determine the type of build to run, are you in the right folder?"
+fi
+
+log "Running ${type} build as '${cmds[*]}'"
+for cmd in "${cmds[@]}"; do
+    ${cmd}
+done
+result=$?
+
+echo -e "\a\a\a"
+exit ${result}
