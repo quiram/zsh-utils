@@ -5,15 +5,6 @@
 BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
 source "${BUILD_SCRIPTS_DIR}/../common/utils"
 
-rebase_if_remote() {
-    remote=$(remote-branch-name)
-
-    if [[ -n "${remote}" ]]; then
-        log "Rebasing from remote (${remote})..."
-        git pull -r || exit 1
-    fi
-}
-
 push_changes() {
     options=$*
     remote=$(remote-branch-name)

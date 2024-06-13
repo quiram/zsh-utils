@@ -13,3 +13,12 @@ if [ -z "${maybe_main}" ]; then
 else
     export main="main"
 fi
+
+rebase_if_remote() {
+    remote=$(remote-branch-name)
+
+    if [[ -n "${remote}" ]]; then
+        log "Rebasing from remote (${remote})..."
+        git pull -r || exit 1
+    fi
+}
