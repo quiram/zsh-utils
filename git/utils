@@ -22,3 +22,16 @@ rebase_if_remote() {
         git pull -r || exit 1
     fi
 }
+
+push_changes() {
+    push_options=$*
+    remote=$(remote-branch-name)
+
+    log "Pushing changes..."
+    if [[ -z "${remote}" ]]; then
+        git push --set-upstream origin "$(branch-name)" || exit 1
+    else
+        # shellcheck disable=SC2086
+        git push ${push_options} || exit 1
+    fi
+}
