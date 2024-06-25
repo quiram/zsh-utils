@@ -6,7 +6,7 @@
 # 3. push
 
 BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
-source "${BUILD_SCRIPTS_DIR}/build-common"
+source "${BUILD_SCRIPTS_DIR}/../git/utils"
 
 run_full_build="${BUILD_SCRIPTS_DIR}/run-full-build"
 update_from_main="${BUILD_SCRIPTS_DIR}/../git/update-from-main"
