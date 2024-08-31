@@ -1,0 +1,50 @@
+#!/usr/bin/env zsh
+
+# Edit the recent commit history of this GIT repository
+# If no number of commits to edit is specified, it will be defaulted to 5
+
+GIT_UTILS_BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${GIT_UTILS_BUILD_SCRIPTS_DIR}/utils"
+
+usage_and_exit() {
+    echo "Usage: $0 [--safe] [number-of-commits]"
+    echo "    Edit the recent commit history of this GIT repository"
+    echo "    --safe: (optional) run a full build after applying each commit"
+    echo "    number-of-commits: (optional) number of commits to go back when editing history (defaults to 5)"
+    exit 1
+}
+
+case $# in
+    0)
+        commits=5
+        ;;
+
+    1)
+        if [[ "$1" = "--safe" ]]; then
+            commits=5
+            rebase_options="--exec run-full-build"
+        else
+            commits=$1
+        fi
+        ;;
+    2)
+        if [[ $1 == "--safe" ]]; then
+            commits=$2
+            rebase_options="--exec run-full-build"
+        else
+            usage_and_exit
+        fi
+        ;;
+
+    *)
+        usage_and_exit
+        ;;
+esac
+
+# Ensure that the number of commits is actually a positive number
+# Note: using the numeric comparator (-eq) on non-numbers fails, so "$x -eq $x" is works to verify whether $x is a number
+[[ "${commits}" -eq "${commits}" && "${commits}" -gt "0" ]] 2>/dev/null || usage_and_exit
+
+# shellcheck disable=SC2086
+git rebase -i ${rebase_options} HEAD~${commits}
+
