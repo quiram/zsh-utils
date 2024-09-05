@@ -46,5 +46,5 @@ esac
 [[ "${commits}" -eq "${commits}" && "${commits}" -gt "0" ]] 2>/dev/null || usage_and_exit
 
 # shellcheck disable=SC2086
-git rebase -i ${rebase_options} HEAD~${commits}
+git rebase -i ${=rebase_options} HEAD~${commits}
 

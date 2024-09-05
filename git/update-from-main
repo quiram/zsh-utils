@@ -48,7 +48,7 @@ else
     # shellcheck disable=SC2154
     log "Rebasing from ${main} into ${branch_name}..."
     # shellcheck disable=SC2086
-    git checkout ${main} && rebase_if_remote && git checkout "${branch_name}" && git rebase ${update_options} ${main}
+    git checkout ${main} && rebase_if_remote && git checkout "${branch_name}" && git rebase ${=update_options} ${main}
     result=$?
 fi
 
