@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+# Tell Homebrew to use a previously downloaded file instead of attempting to download it itself
+# This is useful when Homebrew struggles to download the original file due networking settings
+
+usage() {
+    echo "$0 <formula> <file location>"
+    echo "    <formula>: The formula that you're attempting to install"
+    echo "    <file location>: the location of the pre-downloaded file that you want Homebrew to use"
+    exit 1
+}
+
+if [[ $# -ne 2 ]]; then
+    usage;
+fi
+
+formula=$1
+file_location=$2
+
+destination=$(brew --cache "$formula")
+cp "$file_location" "$destination"
+
