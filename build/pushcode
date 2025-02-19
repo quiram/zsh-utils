@@ -55,11 +55,13 @@ done
 # make sure everything has been committed
 check_for_local_changes
 
-# rebase from main
 if [[ -z ${force} ]]; then
     # rebase only if there is a remote to rebase from
-    ${update_from_main} ${update_options} || exit 1
+    rebase_if_remote
 fi
+
+# rebase from main
+${update_from_main} ${update_options} || exit 1
 
 
 # run the build (if needed)
