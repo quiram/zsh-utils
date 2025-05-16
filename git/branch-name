@@ -2,4 +2,8 @@
 
 # Get the name of the current branch in this GIT repo
 
-git status | grep "On branch" | cut -d\  -f 3
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../git/utils"
+
+
+git symbolic-ref --short HEAD
