@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+
+# Check if granted is installed
+
+if ! command -v granted &> /dev/null; then
+    echo "granted could not be found, please install it first."
+    exit 1
+fi
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <region> <sso-start-url>"
+    exit 1
+fi
+
+region=$1
+sso_start_url=$2
+
+config_file=~/.aws/config
+
+if [ -f "$config_file" ]; then
+    now=$(date +"%Y%m%d%H%M%S")
+    backup_config_file="${config_file}.${now}.bak"
+    mv "$config_file" "${backup_config_file}"
+    echo "Backup existing AWS config file to ${backup_config_file}"
+fi
+
+granted sso populate --sso-region $region $sso_start_url
+
+temp_file=~/.aws/config.tmp
+{ cat <<EOF
+[default]
+sso_registration_scopes = sso:account:access
+
+EOF
+cat ${config_file}; } > ${temp_file} && mv ${temp_file} ${config_file}
