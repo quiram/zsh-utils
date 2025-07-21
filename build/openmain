@@ -7,4 +7,4 @@ BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
 source "${BUILD_SCRIPTS_DIR}/../git/utils"
 
 # shellcheck disable=SC2154
-git checkout "${main}" && openproject
+git switch "${main}" && openproject
