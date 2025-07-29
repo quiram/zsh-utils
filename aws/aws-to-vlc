@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+AWS_TO_VLC_DIR=$(dirname "$(readlink -f "$0")")
+# shellcheck source=../common/utils
+source "${AWS_TO_VLC_DIR}/../common/utils"
+SCRIPT_NAME=$(basename $0)
+
+usage() {
+  echo "${SCRIPT_NAME}: Plays a video stored in AWS S3 using VLC locally.
+It assumes credentials to access the AWS S3 bucket ara already configured.
+
+Usage: $SCRIPT_NAME <S3-url-to-video> [timeout-in-seconds]"
+  fail "Wrong number of arguments"
+}
+
+case $# in
+  0) usage ;;
+  1) timeout_in_seconds=60;;
+  2) timeout_in_seconds=$2 ;;
+  *) usage ;;
+esac
+
+s3_url=$1
+video_url=$(aws s3 presign ${s3_url} --expires-in ${timeout_in_seconds})
+vlc "$video_url" &>/dev/null &
