@@ -21,6 +21,9 @@ elif [[ -f "build.gradle" ]]; then
 elif [[ -f "package.json" ]]; then
     type="node"
     cmds=("npm install" "npm run build")
+elif [[ -f "Makefile" ]]; then
+    type="make"
+    cmds=("make $* build")
 else
     fail "Could not determine the type of build to run, are you in the right folder?"
 fi
