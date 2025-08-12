@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+# Open the AWS S3 Console in the browser using credentials as set up via `assume`
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../common/utils"
+
+[[ -z "$AWS_PROFILE" ]] && fail "No AWS_PROFILE set. Please run `assume` first"
+
+creds=$(aws configure export-credentials --profile "$AWS_PROFILE")
+ak=$(echo "$creds" | jq -r '.AccessKeyId')
+sk=$(echo "$creds" | jq -r '.SecretAccessKey')
+token=$(echo "$creds" | jq -r '.SessionToken')
+json=$(jq -n --arg ak "$ak" --arg sk "$sk" --arg st "$token" '{sessionId: $ak, sessionKey: $sk, sessionToken: $st}')
+signin_token=$(curl -s "https://signin.aws.amazon.com/federation" \
+  --get --data-urlencode "Action=getSigninToken" \
+  --data-urlencode "Session=$json" | jq -r '.SigninToken')
+url_encoded_aws_home=$(jq -rn --arg v "https://us-west-2.console.aws.amazon.com/console/home" '$v|@uri')
+url="https://signin.aws.amazon.com/federation?Action=login&Destination=${url_encoded_aws_home}&SigninToken=$signin_token"
+echo "Opening S3 Console..."; open "$url"
+
