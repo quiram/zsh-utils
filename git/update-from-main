@@ -20,7 +20,8 @@ fi
 for option in "$@"; do
     case ${option} in
         "--safe")
-            update_options="--exec run-full-build"
+            current_dir=$(pwd)
+            update_options="--exec \"cd ${current_dir} run-full-build\""
             ;;
         "--stash")
             stash=1
