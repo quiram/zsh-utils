@@ -10,21 +10,26 @@ usage_and_exit() {
     echo "    Updates the current branch with the latest main value (in remote)"
     echo "    --safe: (optional) run a full build after applying each commit"
     echo "    --stash: (optional) stash local changes prior to updating from main; pop them after successfully updating."
+    echo "    --interactive: (optional) confirm list of actions to perform as part of the rebase"
     exit 1
 }
 
-if [[ $# -gt 2 ]]; then
+if [[ $# -gt 3 ]]; then
     usage_and_exit
 fi
 
+update_options=()
 for option in "$@"; do
     case ${option} in
         "--safe")
             current_dir=$(pwd)
-            update_options="--exec \"cd ${current_dir} run-full-build\""
+            update_options+=("--exec" "cd ${current_dir} && run-full-build")
             ;;
         "--stash")
             stash=1
+            ;;
+        "--interactive")
+            update_options+=("--interactive")
             ;;
         *)
             usage_and_exit
@@ -49,7 +54,7 @@ else
     # shellcheck disable=SC2154
     log "Rebasing from ${main} into ${branch_name}..."
     # shellcheck disable=SC2086
-    git switch ${main} && rebase_if_remote && git switch "${branch_name}" && git rebase ${=update_options} ${main}
+    git switch ${main} && rebase_if_remote && git switch "${branch_name}" && git rebase ${update_options[@]} ${main}
     result=$?
 fi
 
