@@ -5,12 +5,13 @@
 #   - the different available Java kits are all installed using Homebrew
 
 while IFS= read -r -d '' jdk; do
+  # shellcheck disable=SC2034
   existing_versions=$(jenv add $jdk | grep "already present" | cut -f2 -d\  | tr '\n' ' ')
   for existing_version in ${(z)existing_versions}; do
     echo "Removing $existing_version"
-    jenv remove $existing_version
+    jenv remove "$existing_version"
   done
   echo "Adding $jdk"
   jenv add $jdk
-done < <(find /opt/homebrew/Cellar -path "*openjdk*" -maxdepth 2 -mindepth 2 -type d -print0)
+done < <(find /opt/homebrew/Cellar -maxdepth 2 -mindepth 2 -path "*openjdk*" -type d -print0)
 
