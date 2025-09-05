@@ -1,0 +1,49 @@
+#!/usr/bin/env zsh
+
+# Runs a git bisect, optionally restricting the tests that are actually run (maven only)
+
+BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")
+source "${BUILD_SCRIPTS_DIR}/../git/utils"
+
+usage_and_exit() {
+    echo "Usage: $0 old-commit [new-commit [--it-test test-pattern | command]]"
+    echo "    Runs a git bisect, optionally restricting to the test(s) indicated in the pattern"
+    echo "    old-commit: the first commit in the range to be tested"
+    echo "    new-commit: (optional) the last commit in the range to be tested; HEAD if not specified"
+    echo "    test-pattern: (optional) test(s) to execute while running bisect. If specified, no other tests will run."
+    echo "    command: (optional) command to execute when running bisect; cannot be used in conjunction with test-pattern"
+    exit 1
+}
+
+
+old=$1
+new=$2
+case $# in
+    1)
+        new=$(git log --pretty=format:'%H' -n 1)
+        ;;
+    2)
+        # all good
+        ;;
+    3)
+        run_options=$3
+        ;;
+    4)
+        [[ "$3" = "--it-test" ]] || usage_and_exit
+        test_options="-DskipSurefire=true -Dit.test=*$4"
+        run_options="${test_options} -DfailIfNoTests=false clean verify"
+        ;;
+    *)
+        usage_and_exit
+        ;;
+esac
+
+current_dir=$(pwd)
+
+git bisect start && \
+git bisect old "$old" && \
+git bisect new "$new" && \
+# shellcheck disable=SC2086
+git bisect run sh -c "cd ${current_dir} && run-full-build ${run_options}" && \
+git bisect reset
+
