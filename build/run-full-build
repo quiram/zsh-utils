@@ -24,6 +24,9 @@ elif [[ -f "package.json" ]]; then
 elif [[ -f "Makefile" ]]; then
     type="make"
     cmds=("make $* build")
+elif [[ -f "BUILD" ]]; then
+    type="moon"
+    cmds=("moon check")
 else
     fail "Could not determine the type of build to run, are you in the right folder?"
 fi
