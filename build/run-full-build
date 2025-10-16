@@ -24,7 +24,7 @@ elif [[ -f "package.json" ]]; then
 elif [[ -f "Makefile" ]]; then
     type="make"
     cmds=("make $* build")
-elif [[ -f "BUILD" ]]; then
+elif [[ -f "moon.yml" ]]; then
     type="moon"
     cmds=("moon check")
 else
