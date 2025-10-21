@@ -9,6 +9,9 @@ source "${BUILD_SCRIPTS_DIR}/../common/utils"
 if [[ -f "build.sh" ]]; then
     type="custom script"
     cmds=("./build.sh $*")
+elif [[ -f "moon.yml" ]]; then
+    type="moon"
+    cmds=("moon check")
 elif [[ -f "pom.xml" ]]; then
     type="maven"
     cmds=("mvn $* clean install")
@@ -24,9 +27,6 @@ elif [[ -f "package.json" ]]; then
 elif [[ -f "Makefile" ]]; then
     type="make"
     cmds=("make $* build")
-elif [[ -f "moon.yml" ]]; then
-    type="moon"
-    cmds=("moon check")
 else
     fail "Could not determine the type of build to run, are you in the right folder?"
 fi
