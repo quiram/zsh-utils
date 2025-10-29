@@ -11,7 +11,7 @@ if [[ -f "build.sh" ]]; then
     cmds=("./build.sh $*")
 elif [[ -f "moon.yml" ]]; then
     type="moon"
-    cmds=("moon check")
+    cmds=("moon ci")
 elif [[ -f "pom.xml" ]]; then
     type="maven"
     cmds=("mvn $* clean install")
