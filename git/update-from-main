@@ -11,6 +11,7 @@ usage_and_exit() {
     echo "    --safe: (optional) run a full build after applying each commit"
     echo "    --stash: (optional) stash local changes prior to updating from main; pop them after successfully updating."
     echo "    --interactive: (optional) confirm list of actions to perform as part of the rebase"
+    echo "    --merge: (optional) use merge instead of rebase to update from main"
     exit 1
 }
 
@@ -19,6 +20,7 @@ if [[ $# -gt 3 ]]; then
 fi
 
 update_options=()
+operation="rebase"
 for option in "$@"; do
     case ${option} in
         "--safe")
@@ -30,6 +32,9 @@ for option in "$@"; do
             ;;
         "--interactive")
             update_options+=("--interactive")
+            ;;
+        "--merge")
+            operation="merge"
             ;;
         *)
             usage_and_exit
@@ -54,7 +59,7 @@ else
     # shellcheck disable=SC2154
     log "Rebasing from ${main} into ${branch_name}..."
     # shellcheck disable=SC2086
-    git switch ${main} && rebase_if_remote && git switch "${branch_name}" && git rebase ${update_options[@]} ${main}
+    git switch ${main} && rebase_if_remote && git switch "${branch_name}" && git ${operation} ${update_options[@]} ${main}
     result=$?
 fi
 
