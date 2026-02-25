@@ -24,7 +24,7 @@ elif [[ -f "build.gradle" ]]; then
     cmds=("./gradlew $* clean test")
 elif [[ -f "package.json" ]]; then
     type="node"
-    cmds=("nvm install" "npm install" "npm run build")
+    cmds=("nvm install" "npm install" "npm test" "npm run build")
 elif [[ -f "Makefile" ]]; then
     type="make"
     cmds=("make $* build")
