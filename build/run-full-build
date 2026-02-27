@@ -33,10 +33,12 @@ else
 fi
 
 log "Running ${type} build as '${cmds[*]}'"
+result=0
 for cmd in "${cmds[@]}"; do
-    eval ${cmd}
+    eval "${cmd}"
+    result=$?
+    [[ ${result} -ne 0 ]] && break
 done
-result=$?
 
 echo -e "\a\a\a"
 exit ${result}
