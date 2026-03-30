@@ -26,7 +26,7 @@ This is a collection of standalone zsh utility scripts organized by category:
 ## Key Conventions
 
 - All scripts use `#!/usr/bin/env zsh` and should be written in zsh (not bash).
-- Scripts that need shared utilities source them via their own `$BUILD_SCRIPTS_DIR` (resolved with `readlink -f`), never via hardcoded paths.
+- Scripts resolve their own directory with `BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")` and source shared utilities relative to that — never use hardcoded paths.
 - Use `fail "message"` (from `common/utils`) instead of `exit 1` when inside functions; this kills the top-level process via `kill -s TERM $TOP_PID`.
 - The `$main` variable (set in `git/utils`) holds the name of the default branch — always use it instead of hardcoding `main` or `master`.
 - Scripts support optional behaviour through named flags (`--safe`, `--force`, `--stash`, `--merge`, etc.) parsed with a `case` loop; unrecognised flags call a local `usage_and_exit`.
@@ -41,7 +41,7 @@ This is a collection of standalone zsh utility scripts organized by category:
 3. `pom.xml` → Maven (`mvn clean install`)
 4. `build.sbt` → sbt (`sbt test it:test func:test`)
 5. `build.gradle` → Gradle (`./gradlew clean test`)
-6. `package.json` → Node (`npm install && npm run build`)
+6. `package.json` → Node (`npm install` → `npm test` → `npm run quality` → `npm run build`)
 7. `Makefile` → Make (`make build`)
 
 ## Pushing Code
