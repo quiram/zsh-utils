@@ -18,8 +18,8 @@ rebase_if_remote() {
     remote=$(remote-branch-name)
 
     if [[ -n "${remote}" ]]; then
-        log "Rebasing from remote (${remote})..."
-        git pull -r || exit 1
+        log "Pulling from remote (${remote})..."
+        git pull --ff-only || exit 1
     fi
 }
 

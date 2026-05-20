@@ -24,7 +24,7 @@ check_for_local_changes() {
 usage_and_exit() {
     echo "Usage: $0 [--force]"
     echo "    Push changes to remote after running the build and running some local checks."
-    echo "    --force: (optional) don't rebase before pushing, and push with git --force"
+    echo "    --force: (optional) don't rebase before pushing, and push with git --force-with-lease"
     echo "    --safe: (optional) run the build after each commit when rebasing from main"
     echo "    --skip-build: (optional) don't run the build prior to pushing"
     echo "    --merge: (optional) use merge instead of rebase to update from main"
@@ -44,7 +44,7 @@ for option in "$@"; do
             ;;
         "--force")
             force=1
-            git_options="--force"
+            git_options="--force-with-lease"
             ;;
         "--skip-build")
             skip_build=1
