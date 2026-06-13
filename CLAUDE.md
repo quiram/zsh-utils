@@ -26,8 +26,9 @@ This is a collection of standalone zsh utility scripts organized by category:
 ## Key Conventions
 
 - All scripts use `#!/usr/bin/env zsh` and should be written in zsh (not bash).
-- Scripts resolve their own directory with `BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")` and source shared utilities relative to that — never use hardcoded paths.
-- Use `fail "message"` (from `common/utils`) instead of `exit 1` when inside functions; this kills the top-level process via `kill -s TERM $TOP_PID`.
+- Scripts resolve their own directory with `BUILD_SCRIPTS_DIR=$(dirname "$(readlink -f "$0")")` and source shared utilities relative to that — never use hardcoded paths. Scripts that live inside `git/` and source `git/utils` directly use `GIT_UTILS_BUILD_SCRIPTS_DIR` as the variable name instead.
+- `git/utils` internally sources `common/utils`, so scripts only need to source one or the other (not both).
+- Use `fail "message"` (from `common/utils`) instead of `exit 1` when inside functions; this kills the top-level process via `kill -s TERM $TOP_PID`. `silentExec <message> <command> [stop-on-failure]` runs a command silently, printing OK/ERROR; the exit code is available in `$silentExecExitCode` and `stop-on-failure` defaults to `true`.
 - The `$main` variable (set in `git/utils`) holds the name of the default branch — always use it instead of hardcoding `main` or `master`.
 - Scripts support optional behaviour through named flags (`--safe`, `--force`, `--stash`, `--merge`, etc.) parsed with a `case` loop; unrecognised flags call a local `usage_and_exit`.
 - Many scripts support default values via environment variables (e.g. `NEW_BRANCH_PREFIX`, `DEFAULT_NEW_BRANCH_NAME`).
@@ -51,6 +52,16 @@ Use `pushcode` instead of `git push`. It: verifies no uncommitted changes, rebas
 ```zsh
 pushcode              # standard push
 pushcode --skip-build # skip build step
-pushcode --force      # skip rebase, force push
+pushcode --force      # skip rebase, force push with --force-with-lease
 pushcode --merge      # use merge instead of rebase
+```
+
+`update-from-main` can also be run directly:
+
+```zsh
+update-from-main                # rebase current branch onto main
+update-from-main --stash        # stash local changes first, pop after
+update-from-main --interactive  # confirm list of rebase actions before applying
+update-from-main --merge        # merge instead of rebase
+update-from-main --safe         # run full build after each commit during rebase
 ```
