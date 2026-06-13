@@ -15,4 +15,7 @@ log "Upgrade existing packages to latest"
 brew upgrade
 
 log "Ensure only required packages are installed"
-brew bundle --file "${BREWFILE}" --cleanup install
+brew bundle install --file "${BREWFILE}"
+
+log "Remove packages not in Brewfile"
+brew bundle cleanup --file "${BREWFILE}" --force
